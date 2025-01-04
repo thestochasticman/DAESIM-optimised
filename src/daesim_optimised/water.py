@@ -4,8 +4,8 @@ Water class: Includes module parameters and calculations involving the water cyc
 
 import numpy as np
 from attrs import define, field
-from daesim.climate_funcs import *
-from daesim.climate import ClimateModule
+from daesim_optimised.climate_funcs import *
+from daesim_optimised.climate import ClimateModule
 
 @define
 class WaterModule:

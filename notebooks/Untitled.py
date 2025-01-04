@@ -13,6 +13,6 @@
 # ---
 
 # %%
-import daesim.example
+import daesim_optimised.example
 
 # %%

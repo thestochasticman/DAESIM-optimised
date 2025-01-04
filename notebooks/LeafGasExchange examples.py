@@ -22,9 +22,9 @@ from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
 
 # %%
-from daesim.leafgasexchange import LeafGasExchangeModule
-from daesim.climate import *
-from daesim.biophysics_funcs import fT_Q10, fT_arrhenius, fT_arrheniuspeaked
+from daesim_optimised.leafgasexchange import LeafGasExchangeModule
+from daesim_optimised.climate import *
+from daesim_optimised.biophysics_funcs import fT_Q10, fT_arrhenius, fT_arrheniuspeaked
 
 # %%
 Site = ClimateModule()
@@ -331,7 +331,7 @@ plt.show()
 # ## Photosynthesis Model - Farquhar et al. (1981)
 
 # %%
-from daesim.leafgasexchange2 import LeafGasExchangeModule2
+from daesim_optimised.leafgasexchange2 import LeafGasExchangeModule2
 
 # %%
 Leaf = LeafGasExchangeModule2(Site=Site,Jmax_opt=250e-6)

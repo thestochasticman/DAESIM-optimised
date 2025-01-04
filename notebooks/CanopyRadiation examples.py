@@ -20,8 +20,8 @@ from typing import Tuple, Callable
 from scipy.stats import beta
 
 # %%
-from daesim.canopylayers import CanopyLayers
-from daesim.canopyradiation import CanopyRadiation
+from daesim_optimised.canopylayers import CanopyLayers
+from daesim_optimised.canopyradiation import CanopyRadiation
 
 # %% [markdown]
 # ## Class CanopyLayers 
@@ -214,7 +214,7 @@ _swskyd = np.array([100.0,100.0]) # Atmospheric diffuse solar radiation (W/m2)
 swleaf = CanopyRad.calculate(_LAI,_SAI,_CI,_z,_sza,_swskyb,_swskyd)
 
 # %%
-from daesim.utils import array_like_wrapper
+from daesim_optimised.utils import array_like_wrapper
 
 canopyrad_arraylikewrap = array_like_wrapper(CanopyRad.calculate, ["LAI","SAI","CI","z","sza","swskyb","swskyd"])
 swleaf = canopyrad_arraylikewrap(_LAI,_SAI,_CI,_z,_sza,_swskyb,_swskyd)

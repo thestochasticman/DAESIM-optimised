@@ -5,7 +5,7 @@ Plant optimal trajectory carbon allocation model class: Includes equations, calc
 import numpy as np
 from typing import Tuple, Callable
 from attrs import define, field
-from daesim.plantcarbonwater import PlantModel as PlantCH2O
+from daesim_optimised.plantcarbonwater import PlantModel as PlantCH2O
 
 
 @define 

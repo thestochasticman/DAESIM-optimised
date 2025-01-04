@@ -5,7 +5,7 @@ Canopy radiation class: Includes equations, calculators, and parameters
 import numpy as np
 from typing import Tuple, Callable
 from attrs import define, field
-from daesim.canopylayers import CanopyLayers
+from daesim_optimised.canopylayers import CanopyLayers
 
 @define 
 class CanopyRadiation:

@@ -30,12 +30,12 @@ from functools import partial
 from datetime import datetime, date, timedelta
 
 # %%
-from daesim.climate_funcs import *
-from daesim.biophysics_funcs import func_TempCoeff
-from daesim.plant import PlantModuleCalculator, PlantModelSolver
-from daesim.climate import ClimateModule
-from daesim.soil import SoilModuleCalculator
-from daesim.management import ManagementModule
+from daesim_optimised.climate_funcs import *
+from daesim_optimised.biophysics_funcs import func_TempCoeff
+from daesim_optimised.plant import PlantModuleCalculator, PlantModelSolver
+from daesim_optimised.climate import ClimateModule
+from daesim_optimised.soil import SoilModuleCalculator
+from daesim_optimised.management import ManagementModule
 
 # %% [markdown]
 # ### Notes for translating code

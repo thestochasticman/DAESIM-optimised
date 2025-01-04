@@ -7,12 +7,12 @@ from typing import Tuple, Callable
 from attrs import define, field
 from scipy.optimize import OptimizeResult
 from scipy.integrate import solve_ivp
-from daesim.climate import *
-from daesim.biophysics_funcs import func_TempCoeff, growing_degree_days_DTT_nonlinear, growing_degree_days_DTT_linear1, growing_degree_days_DTT_linear2, growing_degree_days_DTT_linear3, growing_degree_days_DTT_linear4, growing_degree_days_DTT_linearpeaked
-from daesim.plantgrowthphases import PlantGrowthPhases
-from daesim.management import ManagementModule
-from daesim.plantcarbonwater import PlantModel as PlantCH2O
-from daesim.plantallocoptimal import PlantOptimalAllocation
+from daesim_optimised.climate import *
+from daesim_optimised.biophysics_funcs import func_TempCoeff, growing_degree_days_DTT_nonlinear, growing_degree_days_DTT_linear1, growing_degree_days_DTT_linear2, growing_degree_days_DTT_linear3, growing_degree_days_DTT_linear4, growing_degree_days_DTT_linearpeaked
+from daesim_optimised.plantgrowthphases import PlantGrowthPhases
+from daesim_optimised.management import ManagementModule
+from daesim_optimised.plantcarbonwater import PlantModel as PlantCH2O
+from daesim_optimised.plantallocoptimal import PlantOptimalAllocation
 
 @define
 class PlantModuleCalculator:

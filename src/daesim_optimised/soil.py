@@ -7,8 +7,8 @@ from typing import Tuple, Callable
 from attrs import define, field
 from scipy.optimize import OptimizeResult
 from scipy.integrate import solve_ivp
-from daesim.biophysics_funcs import func_TempCoeff
-from daesim.management import ManagementModule
+from daesim_optimised.biophysics_funcs import func_TempCoeff
+from daesim_optimised.management import ManagementModule
 
 
 @define

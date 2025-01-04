@@ -21,7 +21,7 @@ import matplotlib.pyplot as plt
 from attrs import define, field
 
 # %%
-from daesim.plantgrowthphases import PlantGrowthPhases
+from daesim_optimised.plantgrowthphases import PlantGrowthPhases
 
 # %%
 PlantGrowthPhases()

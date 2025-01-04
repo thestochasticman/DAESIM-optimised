@@ -20,9 +20,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # %%
-from daesim.climate import ClimateModule
-from daesim.water import WaterModule
-from daesim.boundarylayer import BoundaryLayerModule
+from daesim_optimised.climate import ClimateModule
+from daesim_optimised.water import WaterModule
+from daesim_optimised.boundarylayer import BoundaryLayerModule
 
 # %% [markdown]
 # ## Potential Evapotranspiration and Net Radiation Calculations

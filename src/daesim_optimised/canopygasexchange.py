@@ -5,9 +5,9 @@ Canopy gas exchange model class: Includes equations, calculators, and parameters
 import numpy as np
 from typing import Tuple, Callable
 from attrs import define, field
-from daesim.canopylayers import CanopyLayers
-from daesim.canopyradiation import CanopyRadiation
-from daesim.leafgasexchange2 import LeafGasExchangeModule2
+from daesim_optimised.canopylayers import CanopyLayers
+from daesim_optimised.canopyradiation import CanopyRadiation
+from daesim_optimised.leafgasexchange2 import LeafGasExchangeModule2
 
 @define
 class CanopyGasExchange:

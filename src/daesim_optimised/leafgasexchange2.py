@@ -7,10 +7,10 @@ from typing import Tuple, Callable
 from attrs import define, field
 from scipy.optimize import OptimizeResult
 from scipy.integrate import solve_ivp
-from daesim.biophysics_funcs import fT_arrhenius, fT_arrheniuspeaked, fT_Q10
-from daesim.management import ManagementModule
-from daesim.climate import ClimateModule
-from daesim.climate_funcs import solar_day_calcs
+from daesim_optimised.biophysics_funcs import fT_arrhenius, fT_arrheniuspeaked, fT_Q10
+from daesim_optimised.management import ManagementModule
+from daesim_optimised.climate import ClimateModule
+from daesim_optimised.climate_funcs import solar_day_calcs
 
 @define
 class LeafGasExchangeModule2:

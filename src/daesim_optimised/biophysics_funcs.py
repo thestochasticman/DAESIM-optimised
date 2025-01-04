@@ -11,12 +11,15 @@ def func_TempCoeff(airTempC,optTemperature=20):
         Errorcheck: This function seems okay for temperatures below 40 degC but it goes whacky above 40 degC. This is a problem that we'll have to correct.
         TODO: Correct the whacky values from the calculate_TempCoeff functiono when airTempC > 40 degC.
         """
-        TempCoeff = np.exp(0.20 * (airTempC - optTemperature)) * np.abs(
-            ((40 - airTempC) / (40 - optTemperature))
-        ) ** (
-            0.2 * (40 - optTemperature)
-        )  ## See Stella docs
-        return TempCoeff
+        d = airTempC - optTemperature
+        a = np.exp(0.2 * d)
+        b = 40 - airTempC
+        c = 40 - optTemperature
+        g = 0.2 * c
+        z = a * np.abs(b / c) ** (g)  ## See Stella docs
+        return z
+
+
 
 def fT_arrheniuspeaked(k_25, T_k, E_a=70.0, H_d=200, DeltaS=0.650):
     """
@@ -47,7 +50,7 @@ def fT_arrheniuspeaked(k_25, T_k, E_a=70.0, H_d=200, DeltaS=0.650):
     ----------
     From Medlyn et al. (2002, doi: 10.1046/j.1365-3040.2002.00891.x) Equation 17. Note that this ignores
     the correction as described in Murphy and Stinziano (2020, doi: 10.1111/nph.16883) Equation 10 because 
-    the biochemical parameters were calibrated using the Medlyn formulation. 
+    the biochemical parameters were calibrated using the Medlyn formulation.
     """
     T_k = T_k + 273.15
     R   = 8.314      # universal gas constant J mol-1 K-1

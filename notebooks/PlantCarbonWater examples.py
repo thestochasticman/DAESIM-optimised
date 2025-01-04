@@ -24,15 +24,15 @@ from functools import partial
 from scipy.optimize import bisect
 
 # %%
-from daesim.climate import ClimateModule
-from daesim.leafgasexchange import LeafGasExchangeModule
-from daesim.leafgasexchange2 import LeafGasExchangeModule2
-from daesim.canopygasexchange import CanopyGasExchange
-from daesim.canopylayers import CanopyLayers
-from daesim.canopyradiation import CanopyRadiation
-from daesim.boundarylayer import BoundaryLayerModule
-from daesim.plantcarbonwater import PlantModel
-from daesim.soillayers import SoilLayers
+from daesim_optimised.climate import ClimateModule
+from daesim_optimised.leafgasexchange import LeafGasExchangeModule
+from daesim_optimised.leafgasexchange2 import LeafGasExchangeModule2
+from daesim_optimised.canopygasexchange import CanopyGasExchange
+from daesim_optimised.canopylayers import CanopyLayers
+from daesim_optimised.canopyradiation import CanopyRadiation
+from daesim_optimised.boundarylayer import BoundaryLayerModule
+from daesim_optimised.plantcarbonwater import PlantModel
+from daesim_optimised.soillayers import SoilLayers
 
 # %% [markdown]
 # ### Create instances of each module
@@ -1144,7 +1144,7 @@ plt.tight_layout()
 # <!-- Finally, I want a biophysical constraint that defines the amount of stem biomass. This includes a constraint of stem growth, defined by a parameter for the increment of stem structural dry weight per unit growth of leaves ($Phi_L$; dimensionless; typical range [0.1-1]), and a constraint on maximum amount of biomass in the stem pool -->
 
 # %%
-from daesim.plantallocoptimal import PlantOptimalAllocation
+from daesim_optimised.plantallocoptimal import PlantOptimalAllocation
 
 # %%
 site = ClimateModule()

@@ -8,11 +8,11 @@ from attrs import define, field
 from functools import partial
 from scipy.optimize import OptimizeResult, bisect
 from scipy.integrate import solve_ivp
-from daesim.biophysics_funcs import MinQuadraticSmooth, fT_Q10
-from daesim.climate import ClimateModule
-from daesim.canopygasexchange import CanopyGasExchange
-from daesim.boundarylayer import BoundaryLayerModule
-from daesim.soillayers import SoilLayers
+from daesim_optimised.biophysics_funcs import MinQuadraticSmooth, fT_Q10
+from daesim_optimised.climate import ClimateModule
+from daesim_optimised.canopygasexchange import CanopyGasExchange
+from daesim_optimised.boundarylayer import BoundaryLayerModule
+from daesim_optimised.soillayers import SoilLayers
 
 @define
 class PlantModel:

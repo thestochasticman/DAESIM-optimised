@@ -20,9 +20,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # %%
-from daesim.canopylayers import CanopyLayers
-from daesim.climate import *
-from daesim.boundarylayer import BoundaryLayerModule
+from daesim_optimised.canopylayers import CanopyLayers
+from daesim_optimised.climate import *
+from daesim_optimised.boundarylayer import BoundaryLayerModule
 
 # %% [markdown]
 # # Boundary Layer

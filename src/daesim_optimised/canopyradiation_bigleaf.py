@@ -7,8 +7,8 @@ from typing import Tuple, Callable
 from attrs import define, field
 from scipy.optimize import OptimizeResult
 from scipy.integrate import solve_ivp, quad
-from daesim.climate import ClimateModule
-from daesim.climate_funcs import solar_day_calcs
+from daesim_optimised.climate import ClimateModule
+from daesim_optimised.climate_funcs import solar_day_calcs
 
 @define
 class CanopyRadiation:

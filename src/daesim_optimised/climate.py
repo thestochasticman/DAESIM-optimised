@@ -5,7 +5,7 @@ Climate class: Includes module parameters and solar calculations to specify and 
 import numpy as np
 from attrs import define, field
 from datetime import datetime, date, timedelta
-from daesim.climate_funcs import *
+from daesim_optimised.climate_funcs import *
 
 @define
 class ClimateModule:

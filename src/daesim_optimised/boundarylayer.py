@@ -6,8 +6,8 @@ import numpy as np
 from typing import Callable
 from attrs import define, field
 from datetime import datetime, date, timedelta
-from daesim.climate_funcs import *
-from daesim.climate import *
+from daesim_optimised.climate_funcs import *
+from daesim_optimised.climate import *
 
 @define
 class BoundaryLayerModule:

@@ -25,21 +25,21 @@ from scipy.optimize import OptimizeResult
 import matplotlib.pyplot as plt
 
 # %%
-from daesim.climate import *
-from daesim.plantgrowthphases import PlantGrowthPhases
-from daesim.management import ManagementModule
-from daesim.soillayers import SoilLayers
-from daesim.canopylayers import CanopyLayers
-from daesim.canopyradiation import CanopyRadiation
-from daesim.boundarylayer import BoundaryLayerModule
-from daesim.leafgasexchange import LeafGasExchangeModule
-from daesim.leafgasexchange2 import LeafGasExchangeModule2
-from daesim.canopygasexchange import CanopyGasExchange
-from daesim.plantcarbonwater import PlantModel as PlantCH2O
-from daesim.plantallocoptimal import PlantOptimalAllocation
+from daesim_optimised.climate import *
+from daesim_optimised.plantgrowthphases import PlantGrowthPhases
+from daesim_optimised.management import ManagementModule
+from daesim_optimised.soillayers import SoilLayers
+from daesim_optimised.canopylayers import CanopyLayers
+from daesim_optimised.canopyradiation import CanopyRadiation
+from daesim_optimised.boundarylayer import BoundaryLayerModule
+from daesim_optimised.leafgasexchange import LeafGasExchangeModule
+from daesim_optimised.leafgasexchange2 import LeafGasExchangeModule2
+from daesim_optimised.canopygasexchange import CanopyGasExchange
+from daesim_optimised.plantcarbonwater import PlantModel as PlantCH2O
+from daesim_optimised.plantallocoptimal import PlantOptimalAllocation
 
 # %%
-from daesim.plant_1000 import PlantModuleCalculator
+from daesim_optimised.plant_1000 import PlantModuleCalculator
 
 # %%
 
@@ -302,7 +302,7 @@ Climate_nday_f = interp1d(time_nday, time_nday)   ## nday represents the ordinal
 # ## Use Model with Numerical Solver
 
 # %%
-from daesim.utils import ODEModelSolver
+from daesim_optimised.utils import ODEModelSolver
 
 # %% [markdown]
 # ### Initialise aggregated model with its classes, initial values for the states, and time axis

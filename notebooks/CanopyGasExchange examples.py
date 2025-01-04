@@ -20,19 +20,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # %%
-from daesim.canopylayers import CanopyLayers
-from daesim.canopyradiation import CanopyRadiation
-from daesim.leafgasexchange import LeafGasExchangeModule
-from daesim.leafgasexchange2 import LeafGasExchangeModule2
-from daesim.canopygasexchange import CanopyGasExchange
-from daesim.climate import *
-from daesim.biophysics_funcs import fT_Q10, fT_arrhenius, fT_arrheniuspeaked
-from daesim.boundarylayer import BoundaryLayerModule
-from daesim.canopylayers import CanopyLayers
-from daesim.canopyradiation import CanopyRadiation
-from daesim.climate import *
-from daesim.biophysics_funcs import fT_Q10, fT_arrhenius, fT_arrheniuspeaked
-from daesim.boundarylayer import BoundaryLayerModule
+from daesim_optimised.canopylayers import CanopyLayers
+from daesim_optimised.canopyradiation import CanopyRadiation
+from daesim_optimised.leafgasexchange import LeafGasExchangeModule
+from daesim_optimised.leafgasexchange2 import LeafGasExchangeModule2
+from daesim_optimised.canopygasexchange import CanopyGasExchange
+from daesim_optimised.climate import *
+from daesim_optimised.biophysics_funcs import fT_Q10, fT_arrhenius, fT_arrheniuspeaked
+from daesim_optimised.boundarylayer import BoundaryLayerModule
+from daesim_optimised.canopylayers import CanopyLayers
+from daesim_optimised.canopyradiation import CanopyRadiation
+from daesim_optimised.climate import *
+from daesim_optimised.biophysics_funcs import fT_Q10, fT_arrhenius, fT_arrheniuspeaked
+from daesim_optimised.boundarylayer import BoundaryLayerModule
 
 # %% [markdown]
 # # Canopy Gas Exchange
@@ -86,7 +86,7 @@ Leaf = LeafGasExchangeModule2()
 # This approach treats the canopy as a single "big leaf". 
 
 # %%
-from daesim.canopyradiation_bigleaf import CanopyRadiation as CanopyRadiationBigLeaf
+from daesim_optimised.canopyradiation_bigleaf import CanopyRadiation as CanopyRadiationBigLeaf
 
 # %%
 if clumping_factor == 0.5:
