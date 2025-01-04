@@ -10,6 +10,7 @@ def get_time_and_output_previous():
 
 def get_time_and_output_new():
   from daesim_optimised.biophysics_funcs import fT_arrhenius as f
+  # f(0.25, 0.31, 70.0, 298.15)
   start = time()
   output = f(0.25, 0.31, 70.0, 298.15)
   end = time()

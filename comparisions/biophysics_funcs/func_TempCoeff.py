@@ -1,6 +1,6 @@
 from time import time
 
-PATH_DF_FORCING = '/g/data/xe2/ya6227/DAESIM/example_dfs/DAESim_forcing_Milgadara_2018.csv'
+PATH_DF_FORCING = '/home/y/DAESIM2-ANALYSIS-DATA/DAESim_forcing_Milgadara_2018.csv'
 
 def prepare_inputs_for_function():
   from daesim_optimised.plant import PlantModuleCalculator

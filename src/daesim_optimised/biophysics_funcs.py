@@ -5,7 +5,7 @@ from typing_extensions import Callable
 import numpy as np
 import numba as nb
 
-@nb.vectorize(["float64(float64, float64)"], nopython=True)
+@nb.vectorize(["float64(float64, float64)"])
 def func_TempCoeff_numba(airTempC: float, optTemperature: float=20):
     """
     Vectorized function to calculate the temperature coefficient.
@@ -33,7 +33,6 @@ def func_TempCoeff_numba(airTempC: float, optTemperature: float=20):
     # h = abs(b/c)
     # i = np.exp(g * np.log(h)) # a * (h ** g)
     # z = a * i
-
     delta = airTempC - optTemperature
     ratio = abs((40-airTempC)/(40-optTemperature))
     return np.exp(0.2 * delta) * np.exp((0.2 * optTemperature) * np.log(ratio))
@@ -49,7 +48,7 @@ def func_TempCoeff(airTempC: float, optTemperature: float=20):
 R_fT_arrheniuspeaked = 8.314  # universal gas constant J mol-1 K-1
 T_ref_fT_arrheniuspeaked = 298.15  # Reference temperature in Kelvin
 T_ref_alt_fT_arrheniuspeaked = 289.15  # Alternative reference temperature in Kelvin
-@nb.vectorize('float64(float64, float64, float64, float64, float64)')
+@nb.njit(cache=True)
 def fT_arrheniuspeaked_numba(k_25, T_k, E_a=70.0, H_d=200, DeltaS=0.650):
     """
     Optimized function to apply a peaked Arrhenius-type temperature scaling.
@@ -59,7 +58,6 @@ def fT_arrheniuspeaked_numba(k_25, T_k, E_a=70.0, H_d=200, DeltaS=0.650):
     E_a *= 1e3
     H_d *= 1e3
     DeltaS *= 1e3
-    
     # Convert temperature to Kelvin
     T_k += 273.15
     
@@ -74,12 +72,11 @@ def fT_arrheniuspeaked_numba(k_25, T_k, E_a=70.0, H_d=200, DeltaS=0.650):
     return k_25 * k_scaling
 
 fT_arrheniuspeaked_numba(0.1, 0.1, 70.0, 200, 0.650)
-
 def fT_arrheniuspeaked(k_25, T_k, E_a=70.0, H_d=200, DeltaS=0.650):
   return fT_arrheniuspeaked_numba(k_25, T_k, E_a, H_d, DeltaS)
 
 R_fT_arrhenius = 8.314
-@nb.vectorize('float64(float64, float64, float64, float64)')
+@nb.njit(cache=True)
 def fT_arrhenius_numba(k_25, T_k, E_a, T_opt):
     """
     Applies an Arrhenius-type temperature scaling function to the given parameter.
@@ -117,33 +114,25 @@ fT_arrhenius_numba(0.25, 0.25, 70.0, 298.15)
 
 def fT_arrhenius(k_25, T_k, E_a=70.0, T_opt=298.15):
     return fT_arrhenius_numba(k_25, T_k, E_a, T_opt)
+fT_arrhenius(0.25, 0.25, 70.0, 298.15)
+fT_arrhenius(0.25, 0.25, 70.0, 298.15)
 
-@nb.vectorize(["float64(float64, float64, float64)"], nopython=True)
-def fT_Q10_numba(k_25, T_k, Q10:float=2.0):
+@nb.njit(cache=True)
+def fT_Q10_numba(k_25, T_k, Q10=2.0):
     """
-    Numba-optimized Q10 temperature scaling function.
-    
-    Parameters
-    ----------
-    k_25: float
-        Rate constant at 25oC
-
-    T_k: float
-        Temperature, degrees Celsius
-
-    Q10: float
-        Q10 coefficient (factor change per 10oC increments), unitless
-
-    Returns
-    -------
-    Temperature adjusted rate constant at the given temperature
+    Numba-optimized Q10 temperature scaling function for scalar inputs.
     """
-    return k_25 * Q10 ** ((T_k - 25.0) * 0.1)
-
+    exponent = (T_k - 25.0) * 0.1
+    k_scaling = Q10 ** exponent
+    return k_25 * k_scaling
+  
 fT_Q10_numba(0.1, 0.1, 2.0)
 
 def fT_Q10(k_25, T_k, Q10:float=2.0):
     return fT_Q10_numba(k_25, T_k, Q10)
+  
+fT_Q10(0.1, 0.1, 2.0)
+fT_Q10(0.1, 0.1, 2.0)
 
 @nb.njit
 def _diurnal_temperature(Tmin, Tmax, t_sunrise, t_sunset, tstep=1.0):

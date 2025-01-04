@@ -1,15 +1,14 @@
+from daesim_optimised.biophysics_funcs import fT_arrheniuspeaked as f_optimised
+from daesim.biophysics_funcs import fT_arrheniuspeaked as f
 from time import time
 
-
 def get_time_and_output_previous():
-  from daesim.biophysics_funcs import fT_arrheniuspeaked
   start = time()
-  output = fT_arrheniuspeaked(0.25, 0.31)
+  output = f(0.25, 0.31)
   end = time()
   return (end - start), output
 
 def get_time_and_output_new():
-  from daesim_optimised.biophysics_funcs import fT_arrheniuspeaked as f
   start = time()
   output = f(0.25, 0.31)
   end = time()
@@ -40,4 +39,4 @@ def t():
     return False
   
 if __name__ == '__main__':
-  t()
+  print(t())
