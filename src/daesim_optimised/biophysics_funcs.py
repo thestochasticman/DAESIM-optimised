@@ -1,72 +1,86 @@
 """
 Biophysics helper functions used across more than one DAESim module
 """
-
+from typing_extensions import Callable
 import numpy as np
+import numba as nb
 
-def func_TempCoeff(airTempC,optTemperature=20):
-        """
-        Function to calculate the temperature coefficient.
-
-        Errorcheck: This function seems okay for temperatures below 40 degC but it goes whacky above 40 degC. This is a problem that we'll have to correct.
-        TODO: Correct the whacky values from the calculate_TempCoeff functiono when airTempC > 40 degC.
-        """
-        d = airTempC - optTemperature
-        a = np.exp(0.2 * d)
-        b = 40 - airTempC
-        c = 40 - optTemperature
-        g = 0.2 * c
-        z = a * np.abs(b / c) ** (g)  ## See Stella docs
-        return z
-
-
-
-def fT_arrheniuspeaked(k_25, T_k, E_a=70.0, H_d=200, DeltaS=0.650):
+@nb.vectorize(["float64(float64, float64)"], nopython=True)
+def func_TempCoeff_numba(airTempC: float, optTemperature: float=20):
     """
-    Applies a peaked Arrhenius-type temperature scaling function to the given parameter.
-    
+    Vectorized function to calculate the temperature coefficient.
+    Errorcheck: This function seems okay for temperatures below 40 degC but it goes whacky above 40 degC. This is a problem that we'll have to correct.
+    TODO: Correct the whacky values from the calculate_TempCoeff functiono when airTempC > 40 degC.
     Parameters
     ----------
-    k_25: float
-        Rate constant at 25oC
-
-    T_k: float
-        Temperature, degrees Celsius
-
-    E_a: float
-        Activation energy, kJ mol-1. Describes the rate of exponential increase of the function below the optimum
+    airTempC : float
+        Air temperature in degrees Celsius.
     
-    H_d: float
-        Deactivation energy, kJ mol-1. Describes the rate of decrease of the function above the optimum
+    optTemperature : float
+        Optimal temperature at which the coefficient is 1.
     
-    DeltaS: float
-        Entropy of the process, kJ mol-1 K-1. Also known as an entropy factor but is not readily interpreted.
-
     Returns
     -------
-    Temperature adjusted rate constant at the given temperature.
-
-    References
-    ----------
-    From Medlyn et al. (2002, doi: 10.1046/j.1365-3040.2002.00891.x) Equation 17. Note that this ignores
-    the correction as described in Murphy and Stinziano (2020, doi: 10.1111/nph.16883) Equation 10 because 
-    the biochemical parameters were calibrated using the Medlyn formulation.
+    TempCoeff : float
+        Temperature coefficient.
     """
-    T_k = T_k + 273.15
-    R   = 8.314      # universal gas constant J mol-1 K-1
-    E_a = E_a * 1e3  # convert kJ mol-1 to J mol-1
-    H_d = H_d * 1e3  # convert kJ mol-1 to J mol-1
-    DeltaS = DeltaS * 1e3  # convert kJ mol-1 K-1 to J mol-1 K-1
-    
-    exponential_term1 = (E_a*(T_k - 298.15))/(298.15*R*T_k)
-    exponential_term2 = (298.15 * DeltaS - H_d)/(289.15*R)
-    exponential_term3 = (T_k*DeltaS - H_d)/(T_k*R)
-    
-    k_scaling = np.exp(exponential_term1) * ((1.0 + np.exp(exponential_term2))/(1.0 + np.exp(exponential_term3)))
 
-    return k_25*k_scaling
+    # d = airTempC - optTemperature
+    # a = np.exp(0.2 * d)
+    # b = 40 - airTempC
+    # c = 40 - optTemperature
+    # g = 0.2 * c
+    # h = abs(b/c)
+    # i = np.exp(g * np.log(h)) # a * (h ** g)
+    # z = a * i
 
-def fT_arrhenius(k_25, T_k, E_a=70.0, T_opt=298.15):
+    delta = airTempC - optTemperature
+    ratio = abs((40-airTempC)/(40-optTemperature))
+    return np.exp(0.2 * delta) * np.exp((0.2 * optTemperature) * np.log(ratio))
+
+## Precompiling for faster run time
+func_TempCoeff_numba(np.array([25.0]), 20.0) 
+func_TempCoeff_numba(25.0, 20.0)
+
+def func_TempCoeff(airTempC: float, optTemperature: float=20):
+  return func_TempCoeff_numba(airTempC, optTemperature)
+
+# Precomputed constants
+R_fT_arrheniuspeaked = 8.314  # universal gas constant J mol-1 K-1
+T_ref_fT_arrheniuspeaked = 298.15  # Reference temperature in Kelvin
+T_ref_alt_fT_arrheniuspeaked = 289.15  # Alternative reference temperature in Kelvin
+@nb.vectorize('float64(float64, float64, float64, float64, float64)')
+def fT_arrheniuspeaked_numba(k_25, T_k, E_a=70.0, H_d=200, DeltaS=0.650):
+    """
+    Optimized function to apply a peaked Arrhenius-type temperature scaling.
+    """
+
+    # Convert units from kJ to J
+    E_a *= 1e3
+    H_d *= 1e3
+    DeltaS *= 1e3
+    
+    # Convert temperature to Kelvin
+    T_k += 273.15
+    
+    # Precompute repeated terms
+    reciprocal_T = 1.0 / T_k
+    exp_term1 = (E_a * (T_k - T_ref_fT_arrheniuspeaked)) / (T_ref_fT_arrheniuspeaked * R_fT_arrheniuspeaked * T_k)
+    exp_term2 = (T_ref_fT_arrheniuspeaked * DeltaS - H_d) / (T_ref_alt_fT_arrheniuspeaked * R_fT_arrheniuspeaked)
+    exp_term3 = (T_k * DeltaS - H_d) * reciprocal_T / R_fT_arrheniuspeaked
+    
+    # Compute scaling factor
+    k_scaling = np.exp(exp_term1) * ((1.0 + np.exp(exp_term2)) / (1.0 + np.exp(exp_term3)))
+    return k_25 * k_scaling
+
+fT_arrheniuspeaked_numba(0.1, 0.1, 70.0, 200, 0.650)
+
+def fT_arrheniuspeaked(k_25, T_k, E_a=70.0, H_d=200, DeltaS=0.650):
+  return fT_arrheniuspeaked_numba(k_25, T_k, E_a, H_d, DeltaS)
+
+R_fT_arrhenius = 8.314
+@nb.vectorize('float64(float64, float64, float64, float64)')
+def fT_arrhenius_numba(k_25, T_k, E_a, T_opt):
     """
     Applies an Arrhenius-type temperature scaling function to the given parameter.
     
@@ -93,16 +107,21 @@ def fT_arrhenius(k_25, T_k, E_a=70.0, T_opt=298.15):
     Medlyn et al. (2002) Equation 16
     """
     T_k = T_k + 273.15
-    R   = 8.314      # universal gas constant J mol-1 K-1
     E_a = E_a * 1e3  # convert kJ mol-1 to J mol-1
 
-    k_scaling = np.exp( (E_a * (T_k - T_opt))/(T_opt*R*T_k) ) 
+    k_scaling = np.exp( (E_a * (T_k - T_opt))/(T_opt*R_fT_arrhenius*T_k)) 
 
     return k_25*k_scaling
 
-def fT_Q10(k_25, T_k, Q10=2.0):
+fT_arrhenius_numba(0.25, 0.25, 70.0, 298.15)
+
+def fT_arrhenius(k_25, T_k, E_a=70.0, T_opt=298.15):
+    return fT_arrhenius_numba(k_25, T_k, E_a, T_opt)
+
+@nb.vectorize(["float64(float64, float64, float64)"], nopython=True)
+def fT_Q10_numba(k_25, T_k, Q10:float=2.0):
     """
-    Applies a Q10 temperature scaling function to the given parameter (e.g. a rate constant).
+    Numba-optimized Q10 temperature scaling function.
     
     Parameters
     ----------
@@ -118,111 +137,45 @@ def fT_Q10(k_25, T_k, Q10=2.0):
     Returns
     -------
     Temperature adjusted rate constant at the given temperature
-
     """
-    T_k = T_k + 273.15
-    k_scaling = Q10**((T_k - 298.15)/10)
+    return k_25 * Q10 ** ((T_k - 25.0) * 0.1)
 
-    return k_25*k_scaling
+fT_Q10_numba(0.1, 0.1, 2.0)
 
-def _diurnal_temperature(Tmin,Tmax,t_sunrise,t_sunset,tstep=1):
+def fT_Q10(k_25, T_k, Q10:float=2.0):
+    return fT_Q10_numba(k_25, T_k, Q10)
+
+@nb.njit
+def _diurnal_temperature(Tmin, Tmax, t_sunrise, t_sunset, tstep=1.0):
     """
-    Parameters
-    ----------
-    Tmin: float
-        Minimum daily air temperature (degrees Celsius)
-
-    Tmax: float
-        Maximum daily air temperature (degrees Celsius)
-
-    t_sunrise: float
-        Time of sunrise (24 hour time, e.g. at 6:30 am, t = 6.5)
-
-    t_sunrise: float
-        Time of sunset (24 hour time, e.g. at 8:15 pm, t = 20.25)
-        
-    tstep: float
-        Time step of diurnal cycle (fractional hour e.g. for 1 hour, tstep = 1; for 30 min, tstep = 0.5)
-
-    Returns
-    -------
-
-    T_hr: array_like (length depends on tstep)
-        Temperature derived from Tmin and Tmax daily temperatures. 
+    Numba-optimized function for computing diurnal temperature profile.
     """
-    ## Time array for diurnal cycle (default it 1 hourly starting from 00:00:00)
-    ## - 24 hour time, e.g. at 3 pm, t = 15.0
-    t = np.arange(0,24,tstep)
-
-    T_average = (Tmin+Tmax)/2
-    T_amplitude = (Tmax-Tmin)/2 
-    ## Equation 1
-    T_H_1 = T_average - T_amplitude * (np.cos(np.pi * (t-t_sunrise)/(14-t_sunrise)))
-    ## Equation 2
-    H_prime = (t>14.0)*(t-14.0) + (t<t_sunrise)*(t+10)
-    T_H_2 = T_average + T_amplitude * (np.cos(np.pi * H_prime/(10+t_sunrise)))
-
-    ## Set output to Equation 2
-    T_H = T_H_2
-    ## get indexes of time array where we use Equation 1
-    t_Trise_1 = (t >= t_sunrise) * (t <= 14.0)
-    ## replace the corresponding values in the output array with Equation 1
-    T_H[t_Trise_1] = T_H_1[t_Trise_1]
+    # Time array for diurnal cycle
+    t = np.arange(0, 24, tstep)
+    
+    # Precompute average and amplitude
+    T_average = (Tmin + Tmax) / 2.0
+    T_amplitude = (Tmax - Tmin) / 2.0
+    
+    # Precompute constants for cosine terms
+    coeff1 = np.pi / (14.0 - t_sunrise)
+    coeff2 = np.pi / (10.0 + t_sunrise)
+    
+    # Initialize temperature profile
+    T_H = np.empty_like(t)
+    
+    # Compute temperature using Equation 1 (for daytime)
+    for i in range(t.size):
+        if t[i] >= t_sunrise and t[i] <= 14.0:
+            T_H[i] = T_average - T_amplitude * np.cos(coeff1 * (t[i] - t_sunrise))
+        else:
+            H_prime = t[i] - 14.0 if t[i] > 14.0 else t[i] + 10.0
+            T_H[i] = T_average + T_amplitude * np.cos(coeff2 * H_prime)
+    
     return T_H
 
-def diurnal_temperature(Tmin,Tmax,t_sunrise,t_sunset,tstep=1):
-    """
-    Calculates a synthetic diurnal temperature profile based on the minimum and maximum daily temperature.
-    The model describes the daily temperature curve using a combination of two formulas:
-    a cosine curve to describe daytime warming, and a separate cosine curve for nighttime cooling.
-    
-    The transition points between the two formulas are determined from the sunrise time and the time assumed
-    to reach the maximum temperature (14:00). The first formula is used for daytime warming between sunrise
-    and 14:00. The second formula is used for nighttime cooling from 14:00 to sunrise on the next day.
 
-    References: See "WAVE Model" in Bal et al. (2023, doi:10.1038/s41598-023-34194-9)
-
-    Parameters
-    ----------
-    Tmin: float or ndarray
-        Minimum daily air temperature (degrees Celsius)
-
-    Tmax: float or ndarray
-        Maximum daily air temperature (degrees Celsius)
-
-    t_sunrise: float or ndarray
-        Time of sunrise (24 hour time, e.g. at 6:30 am, t = 6.5)
-
-    t_sunrise: float or ndarray
-        Time of sunset (24 hour time, e.g. at 8:15 pm, t = 20.25)
-
-    tstep: float
-        Time step of diurnal cycle (fractional hour e.g. for 1 hour, tstep = 1; for 30 min, tstep = 0.5)
-
-    Returns
-    -------
-
-    T_hr: float or ndarray
-        Temperature derived from Tmin and Tmax daily temperatures
-    """
-    if Tmin.size != Tmax.size:
-        raise ValueError("Size of Tmin and Tmax inputs must be the same")
-
-    Tmin_ = list(np.array(Tmin))  #np.asarray(Tmin)
-    Tmax_ = list(np.array(Tmax))  #np.asarray(Tmax)
-    iday = 0
-
-    _vfunc = np.vectorize(_diurnal_temperature,otypes=[float])
-    # T_hr = 
-    
-    for (xTmin,xTmax) in zip(Tmin_,Tmax_):
-        _vfunc = np.vectorize(_diurnal_temperature,otypes=[float])
-        if iday == 0:
-            T_hr = _vfunc(t,xTmin,xTmax,t_sunrise,t_sunset)
-        else:
-            T_hr = np.append(T_hr,_vfunc(t,xTmin,xTmax,t_sunrise,t_sunset))
-        iday += 1
-    return np.reshape(T_hr,(Tmin.size,t.size))
+_diurnal_temperature(10.0, 30.0, 6.5, 20.25, 0.5)
 
 def growing_degree_days_HTT(Th,Tb,Tu,Topt,normalise):
     """
