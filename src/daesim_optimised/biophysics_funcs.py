@@ -5,7 +5,7 @@ from typing_extensions import Callable
 import numpy as np
 import numba as nb
 
-@nb.vectorize(["float64(float64, float64)"])
+@nb.vectorize(['float64(float64, float64)'])
 def func_TempCoeff_numba(airTempC: float, optTemperature: float=20):
     """
     Vectorized function to calculate the temperature coefficient.
@@ -135,14 +135,48 @@ def fT_Q10(k_25, T_k, Q10:float=2.0):
 fT_Q10(0.1, 0.1, 2.0)
 fT_Q10(0.1, 0.1, 2.0)
 
-@nb.njit
-def _diurnal_temperature(Tmin, Tmax, t_sunrise, t_sunset, tstep=1.0):
+import numba as nb
+import numpy as np
+
+@nb.njit(cache=True)
+def arange(start, stop, step):
+    """
+    Numba-optimized version of np.arange.
+    
+    Parameters
+    ----------
+    start: float
+        Start of the interval.
+        
+    stop: float
+        End of the interval.
+        
+    step: float
+        Spacing between values.
+        
+    Returns
+    -------
+    result: ndarray
+        Array of evenly spaced values from start to stop (exclusive).
+    """
+    n = int((stop - start) / step)  # Compute the number of elements
+    result = np.empty(n, dtype=np.float64)  # Preallocate array
+
+    value = start
+    for i in range(n):
+        result[i] = value
+        value += step
+    
+    return result
+
+arange(0, 24, 0.5)
+
+@nb.njit(cache=True)
+def _diurnal_temperature(Tmin, Tmax, t_sunrise, t_sunset, t_step=1):
     """
     Numba-optimized function for computing diurnal temperature profile.
     """
-    # Time array for diurnal cycle
-    t = np.arange(0, 24, tstep)
-    
+    t = arange(0, 24, t_step)
     # Precompute average and amplitude
     T_average = (Tmin + Tmax) / 2.0
     T_amplitude = (Tmax - Tmin) / 2.0
@@ -165,6 +199,33 @@ def _diurnal_temperature(Tmin, Tmax, t_sunrise, t_sunset, tstep=1.0):
     return T_H
 
 _diurnal_temperature(10.0, 30.0, 6.5, 20.25, 0.5)
+
+# @nb.njit
+# def diurnal_temperature(Tmin, Tmax, t_sunrise, t_sunset, tstep=1):
+#   # Tmin_is_scalar = np.isscalar(Tmin)
+#   # Tmax_is_scalar = np.isscalar(Tmax)
+#   # print(Tmin_is_scalar)
+#   # if Tmax_is_scalar and Tmin_is_scalar:
+#   #   t = np.arange(0, 24, tstep)
+#   #   return _diurnal_temperature(Tmin, Tmax, t_sunrise, t_sunset, t)
+
+#   # if not Tmax_is_scalar and not Tmax_is_scalar:
+#   if Tmin.size != Tmax.size:
+#     raise ValueError('Size of Tmin and Tmax inputs must be the same')
+#   else:
+#     n_days = Tmin.size
+#     t = np.arange(0, 24, tstep)
+#     n_t_steps = t.size
+#     T_hr = np.empty((n_days, n_t_steps))
+    
+#     for i in nb.prange(n_days):  # Parallel loop over days
+#       T_hr[i, :] = _diurnal_temperature(Tmin[i], Tmax[i], t_sunrise, t_sunset, t)
+#     return T_hr
+#   # else:
+#   #   raise ValueError('One is array, one is float')
+  
+# diurnal_temperature(np.array([5.0]), np.array(6.0), 6.5, 7.5, 1.0)
+    
 
 def growing_degree_days_HTT(Th,Tb,Tu,Topt,normalise):
     """
