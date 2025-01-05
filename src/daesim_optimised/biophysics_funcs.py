@@ -123,7 +123,8 @@ def fT_Q10_numba(k_25, T_k, Q10=2.0):
     Numba-optimized Q10 temperature scaling function for scalar inputs.
     """
     exponent = (T_k - 25.0) * 0.1
-    k_scaling = Q10 ** exponent
+    # k_scaling = Q10 ** exponent
+    k_scaling = np.exp(exponent * np.log(Q10))
     return k_25 * k_scaling
   
 fT_Q10_numba(0.1, 0.1, 2.0)
@@ -162,7 +163,6 @@ def _diurnal_temperature(Tmin, Tmax, t_sunrise, t_sunset, tstep=1.0):
             T_H[i] = T_average + T_amplitude * np.cos(coeff2 * H_prime)
     
     return T_H
-
 
 _diurnal_temperature(10.0, 30.0, 6.5, 20.25, 0.5)
 

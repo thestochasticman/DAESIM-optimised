@@ -10,7 +10,7 @@ def get_time_and_output_previous():
 
 def get_time_and_output_new():
   start = time()
-  output = f(0.25, 0.31)
+  output = f_optimised(0.25, 0.31)
   end = time()
   return (end - start), output
 
